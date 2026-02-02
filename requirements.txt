@@ -1,0 +1,11 @@
+# Quick Environment Switcher - Requirements
+# ==========================================
+# This tool has ZERO external dependencies!
+# It uses only Python standard library.
+#
+# For development/testing, install:
+#   pip install pytest pytest-cov
+#
+# The following are optional development dependencies:
+# pytest>=7.0
+# pytest-cov>=4.0

@@ -1,0 +1,238 @@
+================================================================================
+QUICK ENVIRONMENT SWITCHER - CHEAT SHEET
+================================================================================
+
+QUICK START
+-----------
+1. Install:   git clone https://github.com/DonkRonk17/quick-env-switcher.git
+2. Init:      python envswitch.py init
+3. Add:       python envswitch.py add myproject /path/to/project
+4. Switch:    python envswitch.py switch myproject
+
+================================================================================
+COMMON COMMANDS
+================================================================================
+
+Initialize Configuration:
+  envswitch.py init                          # Creates ~/.envswitch/
+
+Add Environment:
+  envswitch.py add NAME PATH                 # Basic project
+  envswitch.py add NAME PATH --python VENV   # With Python virtualenv
+  envswitch.py add NAME PATH --env KEY=VAL   # With environment variable
+  envswitch.py add NAME PATH --cmd "COMMAND" # With shell command
+  envswitch.py add NAME PATH --desc "DESC"   # With description
+
+Switch Environment:
+  envswitch.py switch NAME                   # Show switch commands
+  envswitch.py switch NAME | bash            # Execute on Linux/Mac
+  envswitch.py switch NAME | Invoke-Expression  # Execute on PowerShell
+
+List Environments:
+  envswitch.py list                          # List all
+  envswitch.py list -s SEARCH                # Search/filter
+
+Get Details:
+  envswitch.py get NAME                      # Show full details
+
+Delete Environment:
+  envswitch.py delete NAME                   # With confirmation
+  envswitch.py delete NAME -y                # Skip confirmation
+
+History:
+  envswitch.py history                       # Last 10 switches
+  envswitch.py history -n 20                 # Last 20 switches
+
+Interactive Mode:
+  envswitch.py interactive                   # Guided prompts
+
+================================================================================
+CLI FLAGS & OPTIONS
+================================================================================
+
+Global:
+  --help, -h                Show help message
+
+Add Command:
+  NAME                      Environment name (required)
+  PATH                      Project path (required)
+  --python PATH             Python virtualenv path
+  --node VERSION            Node.js version (future use)
+  --env KEY=VALUE           Environment variable (repeatable)
+  --cmd "COMMAND"           Shell command (repeatable)
+  --desc "DESCRIPTION"      Human-readable description
+
+List Command:
+  -s, --search TERM         Filter by name, path, or description
+
+Delete Command:
+  -y, --yes                 Skip confirmation prompt
+
+History Command:
+  -n, --limit N             Number of entries (default: 10)
+
+================================================================================
+PYTHON API (PROGRAMMATIC USE)
+================================================================================
+
+Import:
+  from envswitch import (
+      init_config,
+      add_environment,
+      get_environment,
+      list_environments,
+      delete_environment,
+      switch_environment,
+      get_history
+  )
+
+Initialize:
+  init_config()                              # Create config files
+
+Add:
+  add_environment(
+      name="myproject",
+      project_path="/path/to/project",
+      python_env="/path/.venv",              # Optional
+      env_vars={"KEY": "value"},             # Optional
+      shell_commands=["echo hello"],         # Optional
+      description="My project"               # Optional
+  )
+
+Get:
+  env = get_environment("myproject")         # Returns dict or None
+
+List:
+  envs = list_environments()                 # All environments
+  envs = list_environments(search="web")     # Search/filter
+
+Delete:
+  delete_environment("myproject")            # Returns True/False
+
+Switch:
+  commands = switch_environment("myproject") # Returns list of commands
+
+History:
+  history = get_history(limit=10)            # Returns list of dicts
+
+================================================================================
+DATA FILES
+================================================================================
+
+Location:
+  ~/.envswitch/
+  +-- environments.json     # Environment configurations
+  +-- history.json          # Switch history (last 100)
+
+Environment Structure:
+  {
+    "name": "myproject",
+    "project_path": "/absolute/path",
+    "python_env": "/path/to/venv",           # Optional
+    "node_version": "18",                    # Optional (future)
+    "env_vars": {"KEY": "value"},            # Optional
+    "shell_commands": ["echo hello"],        # Optional
+    "description": "My project",             # Optional
+    "created": "2026-01-01T00:00:00",
+    "last_used": "2026-01-15T10:30:00",
+    "use_count": 42
+  }
+
+================================================================================
+INTEGRATION WITH TEAM BRAIN TOOLS
+================================================================================
+
+With AgentHealth:
+  from agenthealth import AgentHealth
+  from envswitch import switch_environment
+  
+  health = AgentHealth()
+  health.start_session("ATLAS")
+  
+  # Switch to project
+  commands = switch_environment("my-project")
+  # Execute commands...
+  
+  health.end_session("ATLAS")
+
+With SynapseLink:
+  from synapselink import quick_send
+  from envswitch import switch_environment
+  
+  commands = switch_environment("deployment")
+  quick_send("TEAM", "Switching to deployment", str(commands))
+
+With MemoryBridge:
+  from memorybridge import MemoryBridge
+  from envswitch import list_environments
+  
+  memory = MemoryBridge()
+  memory.set("current_envs", list_environments())
+
+================================================================================
+SHELL ALIASES & FUNCTIONS
+================================================================================
+
+Bash/Zsh (.bashrc/.zshrc):
+  alias sw='python /path/to/envswitch.py switch'
+  alias swl='python /path/to/envswitch.py list'
+  alias swa='python /path/to/envswitch.py add'
+  
+  # Auto-execute switch
+  function envswitch() {
+      if [ "$1" = "to" ]; then
+          eval "$(python /path/to/envswitch.py switch $2)"
+      else
+          python /path/to/envswitch.py "$@"
+      fi
+  }
+
+PowerShell (profile.ps1):
+  function Switch-Env {
+      param([string]$name)
+      python C:\path\to\envswitch.py switch $name | Invoke-Expression
+  }
+  Set-Alias sw Switch-Env
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Python venv not activating:
+  -> Use path to venv DIRECTORY, not activate script
+  -> Correct: --python /path/.venv
+  -> Wrong:   --python /path/.venv/bin/activate
+
+Commands not executing:
+  -> Switch only GENERATES commands
+  -> Pipe to shell: envswitch.py switch name | bash
+  -> Or use aliases/functions above
+
+Environment not found:
+  -> Check name spelling (case-insensitive)
+  -> Run: envswitch.py list
+  -> Check: cat ~/.envswitch/environments.json
+
+Config file corrupted:
+  -> Delete and recreate: rm -rf ~/.envswitch && envswitch.py init
+
+================================================================================
+RESOURCES
+================================================================================
+
+Documentation:   AutoProjects/quick-env-switcher/README.md
+Examples:        AutoProjects/quick-env-switcher/EXAMPLES.md
+Integration:     AutoProjects/quick-env-switcher/INTEGRATION_PLAN.md
+GitHub:          https://github.com/DonkRonk17/quick-env-switcher
+Issues:          https://github.com/DonkRonk17/quick-env-switcher/issues
+
+================================================================================
+CREDITS
+================================================================================
+
+Built by: ATLAS (Team Brain)
+For: Logan Smith / Metaphy LLC
+Part of: Beacon HQ / Team Brain Ecosystem
+License: MIT
+
+================================================================================
